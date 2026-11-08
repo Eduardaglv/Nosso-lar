@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NossoLar</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--page:#efeff3;--g1:#a59fd6;--g2:#c3bee6;--panel:#8f8ac4;--soft:rgba(70,58,130,.28);--deep:#3a2a5e;--lime:#d4f56b;--card:#fff;--ink:#2b2448;--mute:#7b75a9;--line:#ece9f7;--onp:#fff;--shadow:0 40px 60px -30px rgba(60,50,110,.45);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--page:#14112a;--g1:#3a3370;--g2:#2b2552;--panel:#463f85;--soft:rgba(15,10,45,.4);--deep:#1b1438;--card:#201a3d;--ink:#ece9ff;--mute:#9a94cc;--line:#322b5c;--shadow:0 40px 60px -30px #000}}
+:root[data-theme="dark"]{color-scheme:dark;--page:#14112a;--g1:#3a3370;--g2:#2b2552;--panel:#463f85;--soft:rgba(15,10,45,.4);--deep:#1b1438;--card:#201a3d;--ink:#ece9ff;--mute:#9a94cc;--line:#322b5c;--shadow:0 40px 60px -30px #000}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);font-family:'Outfit',system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink);padding:clamp(8px,3vw,40px)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0}
+.shell{max-width:1180px;margin:0 auto;border-radius:32px;background:linear-gradient(135deg,var(--g1),var(--g2));box-shadow:var(--shadow);display:flex;overflow:hidden;color:var(--onp)}
+.side{width:76px;border-right:1px solid rgba(255,255,255,.22);display:flex;flex-direction:column;align-items:center;gap:14px;padding:22px 0;flex:none}
+.logo{width:40px;height:40px;border:2px solid #fff;border-radius:50%;display:grid;place-items:center;margin-bottom:22px}
+.logo i{width:14px;height:24px;border:2px solid #fff;border-radius:50%;display:block}
+.ico{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.28);display:grid;place-items:center;color:#fff}
+.ico.on{background:var(--deep)}
+.ico svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+main{flex:1;min-width:0;padding:22px 28px 28px}
+header{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{font-size:22px;font-weight:500;margin-right:auto}
+.tabs{display:flex;gap:8px}
+.tab{padding:9px 20px;border-radius:99px;background:rgba(255,255,255,.22);color:#fff;font-size:14px}
+.tab.on{background:var(--deep)}
+.theme{display:flex;background:rgba(255,255,255,.22);border-radius:99px;padding:4px}
+.theme button{padding:7px 16px;border-radius:99px;background:none;color:#fff;font-size:14px}
+.theme button.on{background:#fff;color:var(--deep)}
+.avs{display:flex}.av{width:38px;height:38px;border-radius:50%;border:2px solid #fff;display:grid;place-items:center;font-weight:600;font-size:14px;color:var(--deep);background:var(--lime)}
+.av+.av{margin-left:-10px;background:#fff}
+.hero{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;margin:30px 0 24px}
+.hero h1{margin:0;font-size:34px;font-weight:500}
+.hero p{margin:4px 0 0;font-size:14px;opacity:.85}
+.stats{display:flex;gap:28px;margin-left:auto;align-items:flex-end;flex-wrap:wrap}
+.stat small{display:block;font-size:13px;opacity:.85}
+.stat b{font-size:28px;font-weight:500}
+.stat+.stat{border-left:1px solid rgba(255,255,255,.3);padding-left:28px}
+.btn{background:var(--deep);color:#fff;padding:13px 22px;border-radius:14px;font-size:15px;display:inline-flex;gap:8px;align-items:center}
+.btn.lime{background:var(--lime);color:#2b2448}
+.btn.sm{padding:8px 14px;font-size:13px;border-radius:99px}
+.grid{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
+.col{display:flex;flex-direction:column;gap:18px}
+.glass{background:var(--panel);border-radius:26px;padding:20px}
+.glass h3,.white h3{margin:0;font-size:17px;font-weight:500}
+.main-goal{display:flex;gap:16px;align-items:center;margin-top:16px}
+.ring{--p:0;width:96px;height:96px;border-radius:50%;flex:none;background:conic-gradient(var(--lime) calc(var(--p)*1%),rgba(255,255,255,.25) 0);display:grid;place-items:center}
+.ring span{width:76px;height:76px;border-radius:50%;background:var(--panel);display:grid;place-items:center;font-size:22px;font-weight:500}
+.main-goal small{opacity:.85;display:block}
+.main-goal b{font-size:22px;font-weight:500}
+.log{margin-top:14px;font-size:13px;display:flex;flex-direction:column;gap:6px}
+.log div{display:flex;justify-content:space-between;background:var(--soft);padding:8px 12px;border-radius:12px}
+.white{background:var(--card);color:var(--ink);border-radius:26px;padding:20px}
+.head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.link{background:none;color:var(--mute);font-size:13px;display:inline-flex;align-items:center;gap:6px}
+.link i{width:22px;height:22px;border-radius:50%;background:var(--panel);color:#fff;display:grid;place-items:center;font-style:normal;line-height:1}
+.goal{padding:14px 0;border-top:1px solid var(--line)}
+.goal:first-of-type{margin-top:10px}
+.goal .row{display:flex;justify-content:space-between;font-size:14px;gap:8px}
+.goal .row span{color:var(--mute)}
+.bar{height:8px;border-radius:9px;background:var(--line);margin:8px 0;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--panel);border-radius:9px}
+.bar.done i{background:#a6d62a}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:6px 13px;border-radius:99px;background:var(--line);color:var(--mute);font-size:13px}
+.chip.on{background:var(--panel);color:#fff}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
+.room{margin-top:18px}
+.room h4{margin:0 0 6px;font-weight:500;font-size:14px;color:var(--mute);display:flex;justify-content:space-between}
+.item{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;padding:12px 14px;border-radius:16px;background:var(--line);margin-bottom:8px;cursor:pointer}
+.item.bought{background:var(--lime);color:#2b2448}
+.chk{width:24px;height:24px;border-radius:50%;border:2px solid var(--panel);background:none;color:#fff;display:grid;place-items:center;padding:0;font-size:13px}
+.item.bought .chk{background:var(--deep);border-color:var(--deep)}
+.item .nm{font-size:15px;min-width:0;overflow-wrap:anywhere}
+.item .nm small{display:block;opacity:.7;font-size:12px}
+.item.bought .nm b{font-weight:400;text-decoration:line-through;text-decoration-color:rgba(43,36,72,.5)}
+.item .pr{font-weight:500;font-size:15px;white-space:nowrap}
+.empty{text-align:center;color:var(--mute);padding:36px 10px;font-size:14px}
+.sum{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap}
+.pill{flex:1;min-width:110px;background:var(--line);border-radius:16px;padding:12px 14px;font-size:13px;color:var(--mute)}
+.pill b{display:block;font-size:19px;font-weight:500;color:var(--ink)}
+.mask{position:fixed;inset:0;background:rgba(30,22,60,.55);display:grid;place-items:center;padding:16px;z-index:50}
+.modal{background:var(--card);color:var(--ink);border-radius:26px;padding:24px;width:min(420px,100%);max-height:90vh;overflow:auto}
+.modal h3{margin:0 0 14px;font-weight:500;font-size:20px}
+.modal label{display:block;font-size:13px;color:var(--mute);margin:12px 0 4px}
+.modal input,.modal select{width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--line);outline:none}
+.modal input:focus{border-color:var(--panel)}
+.modal .foot{display:flex;gap:8px;margin-top:20px;justify-content:flex-end}
+.btn.ghost{background:var(--line);color:var(--mute)}
+.btn.danger{background:none;color:#d0556b;margin-right:auto;padding-left:0}
+.status{font-size:12px;opacity:.85;margin-top:14px;text-align:center}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.side{display:none}main{padding:18px 16px 24px}.stats{margin-left:0}.stat+.stat{border:0;padding:0}.tabs{order:5;width:100%}}
+
+#login{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:16px;background:linear-gradient(135deg,var(--g1),var(--g2))}
+#login .modal{text-align:center}
+#login .logo{margin:0 auto 14px;border-color:var(--panel)}#login .logo i{border-color:var(--panel)}
+#login .err{color:#d0556b;font-size:13px;min-height:18px;margin-top:10px}
+#login .btn{width:100%;justify-content:center;margin-top:16px}
+#login label{text-align:left}
+.out{background:none;color:#fff;font-size:13px;opacity:.85;text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <div class="logo"><i></i></div>
+    <button class="ico on" title="Casa" onclick="go('casa')"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg></button>
+    <button class="ico" title="Metas" onclick="go('metas')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></button>
+  </aside>
+  <main>
+    <header>
+      <div class="brand">NossoLar</div>
+      <div class="tabs" id="tabs"></div>
+      <div class="theme"><button id="tD">Escuro</button><button id="tL">Claro</button></div>
+      <button class="out" id="logout" style="display:none">Sair</button><div class="avs"><div class="av">Eu</div><div class="av">♥</div></div>
+    </header>
+    <section class="hero">
+      <div><h1>Nossa Casa</h1><p>tudo o que já compramos, o que falta e quanto já guardamos</p></div>
+      <div class="stats" id="stats"></div>
+      <button class="btn" onclick="itemModal()">＋ Adicionar item</button>
+    </section>
+    <section class="grid">
+      <div class="col" id="metas"></div>
+      <div class="white" id="casa"></div>
+    </section>
+    <div class="status" id="status"></div>
+  </main>
+</div>
+<div id="login"><div class="modal"><div class="logo"><i></i></div><h3>NossoLar</h3><div style="color:var(--mute);font-size:14px">Entre para ver a casa e as metas de vocês</div>
+<label>E-mail</label><input id="lE" type="email" autocomplete="username"><label>Senha</label><input id="lP" type="password" autocomplete="current-password"><button class="btn" id="lB">Entrar</button><div class="err" id="lErr"></div></div></div>
+<div id="modalRoot"></div>
+<script>
+const $=s=>document.querySelector(s);
+const brl=n=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n||0);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9);
+const num=v=>{const n=parseFloat(String(v).replace(/\./g,'').replace(',','.'));return isNaN(n)?0:n};
+const fmt=v=>v?String(v).replace('.',','):'';
+const ROOMS=['Sala','Cozinha','Quarto','Banheiro','Lavanderia','Escritório','Outros'];
+let S={items:[],goals:[]},ref=null,filter='all',roomF='';
+
+let sb=null;
+async function save(){render();if(!sb)return;const{error}=await sb.from('app_state').upsert({id:'main',data:S,updated_at:new Date().toISOString()});status(error?'Não foi possível salvar: '+error.message:'Salvo ✓')}
+function status(t){$('#status').textContent=t||''}
+function go(id){document.getElementById(id).scrollIntoView({behavior:'smooth'})}
+
+/* tema */
+function theme(t){document.documentElement.dataset.theme=t;$('#tD').classList.toggle('on',t==='dark');$('#tL').classList.toggle('on',t==='light');try{localStorage.setItem('nl-theme',t)}catch(e){}}
+let t0=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+try{t0=localStorage.getItem('nl-theme')||t0}catch(e){}
+$('#tD').onclick=()=>theme('dark');$('#tL').onclick=()=>theme('light');theme(t0);
+
+/* render */
+function render(){
+  const bought=S.items.filter(i=>i.bought),missing=S.items.filter(i=>!i.bought);
+  const spent=bought.reduce((a,i)=>a+i.price,0),left=missing.reduce((a,i)=>a+i.price,0),saved=S.goals.reduce((a,g)=>a+g.saved,0);
+  $('#stats').innerHTML=`<div class="stat"><small>Já gastamos</small><b>${brl(spent)}</b></div><div class="stat"><small>Ainda falta</small><b>${brl(left)}</b></div><div class="stat"><small>Total guardado</small><b>${brl(saved)}</b></div>`;
+  $('#tabs').innerHTML=[['all','Tudo'],['bought','Comprado'],['missing','Falta comprar']].map(([k,l])=>`<button class="tab ${filter===k?'on':''}" onclick="setF('${k}')">${l}</button>`).join('');
+
+  /* metas */
+  const [m,...others]=S.goals;
+  let h='';
+  if(m){const p=Math.min(100,Math.round(m.saved/(m.target||1)*100));
+    h+=`<div class="glass"><div class="head"><h3>${esc(m.name)}</h3><button class="link" style="color:#fff" onclick="goalModal('${m.id}')">editar</button></div>
+    <div class="main-goal"><div class="ring" style="--p:${p}"><span>${p}%</span></div><div><small>Guardado</small><b>${brl(m.saved)}</b><small>de ${brl(m.target)}</small><small>faltam ${brl(Math.max(0,m.target-m.saved))}</small></div></div>
+    <div style="margin-top:14px"><button class="btn lime sm" onclick="depModal('${m.id}')">＋ Guardar dinheiro</button></div>
+    <div class="log">${(m.log||[]).slice(-3).reverse().map(l=>`<div><span>${esc(l.d)}</span><b>${l.v<0?'−':'+'} ${brl(Math.abs(l.v))}</b></div>`).join('')}</div><div style="margin-top:10px"><button class="link" style="color:#fff" onclick="histModal('${m.id}')">Editar ou excluir lançamentos ›</button></div></div>`;
+  }else h+=`<div class="glass"><h3>Meta principal</h3><p style="font-size:14px;opacity:.9">Crie a meta do apartamento para acompanhar o quanto já guardaram.</p><button class="btn lime sm" onclick="goalModal()">＋ Criar meta</button></div>`;
+  h+=`<div class="white"><div class="head"><h3>Outras conquistas</h3><button class="link" onclick="goalModal()">Nova meta <i>+</i></button></div>`;
+  h+=others.length?others.map(g=>{const p=Math.min(100,Math.round(g.saved/(g.target||1)*100));return `<div class="goal"><div class="row"><b style="font-weight:500">${esc(g.name)}</b><span>${p}%</span></div><div class="bar ${p>=100?'done':''}"><i style="width:${p}%"></i></div><div class="row"><span>${brl(g.saved)} / ${brl(g.target)}</span><div class="actions"><button class="chip" onclick="depModal('${g.id}')">+ guardar</button><button class="chip" onclick="histModal('${g.id}')">lançamentos</button><button class="chip" onclick="goalModal('${g.id}')">editar</button></div></div></div>`}).join(''):`<div class="empty">Viagem, carro, casamento… adicione o que vocês querem conquistar.</div>`;
+  h+=`</div>`;
+  $('#metas').innerHTML=h;
+
+  /* casa */
+  const rooms=[...new Set(S.items.map(i=>i.room||'Outros'))];
+  let c=`<div class="head"><h3>Itens da casa</h3><span class="link">${bought.length} de ${S.items.length} comprados</span></div>`;
+  c+=`<div class="sum"><div class="pill">Comprado<b>${brl(spent)}</b></div><div class="pill">Falta<b>${brl(left)}</b></div><div class="pill">Orçamento total<b>${brl(spent+left)}</b></div></div>`;
+  if(rooms.length)c+=`<div class="filters"><button class="chip ${!roomF?'on':''}" onclick="setR('')">Todos os cômodos</button>${rooms.map(r=>`<button class="chip ${roomF===r?'on':''}" onclick="setR('${esc(r)}')">${esc(r)}</button>`).join('')}</div>`;
+  const vis=S.items.filter(i=>(filter==='all'||(filter==='bought')===!!i.bought)&&(!roomF||(i.room||'Outros')===roomF));
+  if(!vis.length)c+=`<div class="empty">${S.items.length?'Nada por aqui com esse filtro.':'Nenhum item ainda. Toque em “Adicionar item” para começar a lista da casa.'}</div>`;
+  rooms.forEach(r=>{const L=vis.filter(i=>(i.room||'Outros')===r);if(!L.length)return;
+    c+=`<div class="room"><h4><span>${esc(r)}</span><span>${brl(L.reduce((a,i)=>a+i.price,0))}</span></h4>${L.map(i=>`<div class="item ${i.bought?'bought':''}" onclick="itemModal('${i.id}')"><button class="chk" onclick="event.stopPropagation();tog('${i.id}')" aria-label="Marcar como comprado">${i.bought?'✓':''}</button><div class="nm"><b>${esc(i.name)}</b><small>${i.bought?'comprado':'falta comprar'}</small></div><div class="pr">${brl(i.price)}</div></div>`).join('')}</div>`});
+  $('#casa').innerHTML=c;
+}
+function setF(k){filter=k;render()}
+function setR(r){roomF=r;render()}
+function tog(id){const i=S.items.find(x=>x.id===id);if(i){i.bought=!i.bought;save()}}
+
+/* modais */
+function modal(html,onSave,onDel){
+  const r=$('#modalRoot');r.innerHTML=`<div class="mask"><div class="modal">${html}<div class="foot">${onDel?'<button class="btn danger" id="mDel">Excluir</button>':''}<button class="btn ghost" id="mNo">Cancelar</button><button class="btn" id="mOk">Salvar</button></div></div></div>`;
+  const close=()=>r.innerHTML='';
+  r.querySelector('.mask').onclick=e=>{if(e.target.classList.contains('mask'))close()};
+  $('#mNo').onclick=close;$('#mOk').onclick=()=>{onSave();close()};
+  if(onDel)$('#mDel').onclick=()=>{const b=$('#mDel');if(b.dataset.s){onDel();close()}else{b.dataset.s=1;b.textContent='Confirmar exclusão?'}};
+  const f=r.querySelector('input');if(f)f.focus();
+}
+function itemModal(id){
+  const it=S.items.find(x=>x.id===id)||{name:'',room:'Sala',price:0,bought:false};
+  modal(`<h3>${id?'Editar item':'Novo item'}</h3><label>O que é?</label><input id="fN" value="${esc(it.name)}" placeholder="Ex.: Sofá retrátil"><label>Cômodo</label><select id="fR" onchange="$('#fNew').style.display=this.value==='__new'?'block':'none';if(this.value==='__new')$('#fNew').focus()">${[...new Set([...ROOMS,...S.items.map(x=>x.room),it.room])].filter(Boolean).map(r=>`<option value="${esc(r)}" ${r===it.room?'selected':''}>${esc(r)}</option>`).join('')}<option value="__new">＋ Novo cômodo…</option></select><input id="fNew" style="display:none;margin-top:8px" placeholder="Nome do cômodo (ex.: Varanda)"><label>Preço (R$)</label><input id="fP" inputmode="decimal" value="${fmt(it.price)}" placeholder="0,00"><label style="display:flex;gap:10px;align-items:center;margin-top:16px;color:inherit"><input type="checkbox" id="fB" style="width:auto" ${it.bought?'checked':''}> Já comprei</label>`,
+  ()=>{const n=$('#fN').value.trim();if(!n)return;const d={name:n,room:($('#fR').value==='__new'?$('#fNew').value.trim():$('#fR').value)||'Outros',price:num($('#fP').value),bought:$('#fB').checked};
+    if(id)Object.assign(S.items.find(x=>x.id===id),d);else S.items.push({id:uid(),...d});save()},
+  id?()=>{S.items=S.items.filter(x=>x.id!==id);save()}:null);
+}
+function goalModal(id){
+  const g=S.goals.find(x=>x.id===id)||{name:'',target:0,saved:0};
+  modal(`<h3>${id?'Editar meta':'Nova meta'}</h3><label>Nome</label><input id="gN" value="${esc(g.name)}" placeholder="Ex.: Entrada do apartamento"><label>Valor da meta (R$)</label><input id="gT" inputmode="decimal" value="${fmt(g.target)}"><label>Já guardado (R$)</label><input id="gS" inputmode="decimal" value="${fmt(g.saved)}">${S.goals.length?'':'<p style="font-size:12px;color:var(--mute)">A primeira meta aparece em destaque como meta principal.</p>'}`,
+  ()=>{const n=$('#gN').value.trim();if(!n)return;const d={name:n,target:num($('#gT').value),saved:num($('#gS').value)};
+    if(id)Object.assign(S.goals.find(x=>x.id===id),d);else S.goals.push({id:uid(),log:[],...d});save()},
+  id?()=>{S.goals=S.goals.filter(x=>x.id!==id);save()}:null);
+}
+function depModal(id){
+  const g=S.goals.find(x=>x.id===id);
+  modal(`<h3>Guardar em “${esc(g.name)}”</h3><label>Valor (R$) — use negativo para retirar</label><input id="dV" inputmode="decimal" placeholder="500,00">`,
+  ()=>{const v=num($('#dV').value);if(!v)return;g.saved=Math.max(0,g.saved+v);g.log=(g.log||[]).concat({v,d:new Date().toLocaleDateString('pt-BR')}).slice(-200);save()});
+}
+
+function histModal(id){
+  const g=S.goals.find(x=>x.id===id);if(!g)return;
+  const r=$('#modalRoot'),L=g.log||[];
+  r.innerHTML=`<div class="mask"><div class="modal"><h3>Lançamentos de “${esc(g.name)}”</h3>${L.length?L.map((l,i)=>[l,i]).reverse().map(([l,i])=>`<div class="item" style="cursor:default;grid-template-columns:1fr auto auto"><div class="nm"><b>${l.v<0?'−':'+'} ${brl(Math.abs(l.v))}</b><small>${esc(l.d)}</small></div><button class="chip" style="background:var(--card)" onclick="editEntry('${id}',${i})">editar</button><button class="chip" style="background:var(--card)" onclick="this.dataset.s?delEntry('${id}',${i}):(this.dataset.s=1,this.textContent='confirmar?')">excluir</button></div>`).join(''):'<div class="empty">Nenhum lançamento ainda.</div>'}<div class="foot"><button class="btn" id="hOk">Fechar</button></div></div></div>`;
+  r.querySelector('.mask').onclick=e=>{if(e.target.classList.contains('mask'))r.innerHTML=''};
+  $('#hOk').onclick=()=>r.innerHTML='';
+}
+function delEntry(id,i){const g=S.goals.find(x=>x.id===id);g.saved=Math.max(0,g.saved-g.log[i].v);g.log.splice(i,1);save();histModal(id)}
+function editEntry(id,i){
+  const g=S.goals.find(x=>x.id===id),l=g.log[i];
+  modal(`<h3>Editar lançamento</h3><label>Valor (R$) — negativo para retirada</label><input id="eV" inputmode="decimal" value="${String(l.v).replace('.',',')}"><label>Data</label><input id="eD" value="${esc(l.d)}">`,
+  ()=>{const v=num($('#eV').value);if(v){g.saved=Math.max(0,g.saved-l.v+v);l.v=v;l.d=$('#eD').value.trim()||l.d;save()}setTimeout(()=>histModal(id),0)},
+  ()=>{g.saved=Math.max(0,g.saved-l.v);g.log.splice(i,1);save();setTimeout(()=>histModal(id),0)});
+}
+
+/* sincronização (Supabase) */
+const SUPA_URL='https://vaikivsbeeuunwfrsftn.supabase.co',SUPA_KEY='sb_publishable_SrrMN1-9UxR3ZqYuuPWE1A_4ja7LUmx';
+const INICIAL={goals:[{id:'evazrlk',log:[{d:'07/11/2026',v:700},{d:'07/11/2026',v:700}],name:'Apartamento',saved:6900,target:20000},{id:'tbgy3um',log:[{d:'07/11/2026',v:600},{d:'07/11/2026',v:800}],name:'Carro',saved:1400,target:40000},{id:'1w1vp18',log:[],name:'CNH',saved:0,target:2000}],items:[{bought:false,id:'ihdtocl',name:'Sofá',price:500,room:'Sala'},{bought:false,id:'wcqkbvo',name:'Mesa',price:300,room:'Sala'},{bought:true,id:'b2r80ni',name:'Cama',price:1500,room:'Quarto'},{bought:true,id:'hzpj2tv',name:'Armário',price:800,room:'Cozinha'},{bought:true,id:'nna3wzo',name:'Lençol',price:30,room:'Quarto'}]};
+let started=false;
+function apply(d){S={items:d.items||[],goals:d.goals||[]};render()}
+async function start(){
+  if(started)return;started=true;
+  $('#login').style.display='none';$('#logout').style.display='';
+  let{data,error}=await sb.from('app_state').select('data').eq('id','main').maybeSingle();
+  if(error){status('Erro ao carregar: '+error.message);return}
+  if(data)apply(data.data);else{S=JSON.parse(JSON.stringify(INICIAL));await save()}
+  sb.channel('app_state_main').on('postgres_changes',{event:'*',schema:'public',table:'app_state',filter:'id=eq.main'},p=>{if(p.new&&p.new.data){apply(p.new.data);status('Atualizado agora ✓')}}).subscribe();
+  status('Sincronizado com vocês dois ✓');
+}
+async function login(){
+  $('#lErr').textContent='';$('#lB').disabled=true;
+  const{error}=await sb.auth.signInWithPassword({email:$('#lE').value.trim().toLowerCase(),password:$('#lP').value});
+  $('#lB').disabled=false;
+  if(error)$('#lErr').textContent='E-mail ou senha incorretos.';else start();
+}
+if(window.supabase){
+  sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+  $('#lB').onclick=login;$('#lP').onkeydown=e=>{if(e.key==='Enter')login()};
+  $('#logout').onclick=async()=>{await sb.auth.signOut();location.reload()};
+  sb.auth.getSession().then(({data})=>{if(data.session)start()});
+}else{$('#lErr').textContent='Não foi possível carregar o sistema de login. Verifique sua conexão.'}
+render();
+</script>
+</body>
+</html>
