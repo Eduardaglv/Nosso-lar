@@ -101,6 +101,8 @@ header{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 #login .err{color:#d0556b;font-size:13px;min-height:18px;margin-top:10px}
 #login .btn{width:100%;justify-content:center;margin-top:16px}
 #login label{text-align:left}
+.item .pr{display:flex;gap:10px;align-items:center}
+.lk{background:var(--card);color:var(--ink);text-decoration:none;font-size:12px;padding:4px 10px;border-radius:99px;white-space:nowrap}
 .out{background:none;color:#fff;font-size:13px;opacity:.85;text-decoration:underline}
 </style>
 </head>
@@ -140,6 +142,13 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const uid=()=>Math.random().toString(36).slice(2,9);
 const num=v=>{const n=parseFloat(String(v).replace(/\./g,'').replace(',','.'));return isNaN(n)?0:n};
 const fmt=v=>v?String(v).replace('.',','):'';
+const fdate=d=>d?d.split('-').reverse().join('/'):'';
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const normLink=v=>{v=(v||'').trim();return v&&!/^https?:\/\//i.test(v)?'https://'+v:v};
+const PEOPLE=['Eduarda','Mariana','As duas'];
+const nameOf=e=>{e=(e||'').toLowerCase();return e.startsWith('eduarda')?'Eduarda':e.startsWith('mariana')?'Mariana':''};
+let me='';
+function boughtToggle(c){$('#fBox').style.display=c?'block':'none'}
 const ROOMS=['Sala','Cozinha','Quarto','Banheiro','Lavanderia','Escritório','Outros'];
 let S={items:[],goals:[]},ref=null,filter='all',roomF='';
 
@@ -183,12 +192,12 @@ function render(){
   const vis=S.items.filter(i=>(filter==='all'||(filter==='bought')===!!i.bought)&&(!roomF||(i.room||'Outros')===roomF));
   if(!vis.length)c+=`<div class="empty">${S.items.length?'Nada por aqui com esse filtro.':'Nenhum item ainda. Toque em “Adicionar item” para começar a lista da casa.'}</div>`;
   rooms.forEach(r=>{const L=vis.filter(i=>(i.room||'Outros')===r);if(!L.length)return;
-    c+=`<div class="room"><h4><span>${esc(r)}</span><span>${brl(L.reduce((a,i)=>a+i.price,0))}</span></h4>${L.map(i=>`<div class="item ${i.bought?'bought':''}" onclick="itemModal('${i.id}')"><button class="chk" onclick="event.stopPropagation();tog('${i.id}')" aria-label="Marcar como comprado">${i.bought?'✓':''}</button><div class="nm"><b>${esc(i.name)}</b><small>${i.bought?'comprado':'falta comprar'}</small></div><div class="pr">${brl(i.price)}</div></div>`).join('')}</div>`});
+    c+=`<div class="room"><h4><span>${esc(r)}</span><span>${brl(L.reduce((a,i)=>a+i.price,0))}</span></h4>${L.map(i=>`<div class="item ${i.bought?'bought':''}" onclick="itemModal('${i.id}')"><button class="chk" onclick="event.stopPropagation();tog('${i.id}')" aria-label="Marcar como comprado">${i.bought?'✓':''}</button><div class="nm"><b>${esc(i.name)}</b><small>${i.bought?('comprado'+(i.by?' por '+esc(i.by):'')+(i.date?' · '+fdate(i.date):'')):'falta comprar'}</small></div><div class="pr">${i.link?`<a class="lk" href="${esc(i.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">ver produto ↗</a>`:''}<span>${brl(i.price)}</span></div></div>`).join('')}</div>`});
   $('#casa').innerHTML=c;
 }
 function setF(k){filter=k;render()}
 function setR(r){roomF=r;render()}
-function tog(id){const i=S.items.find(x=>x.id===id);if(i){i.bought=!i.bought;save()}}
+function tog(id){const i=S.items.find(x=>x.id===id);if(i){i.bought=!i.bought;i.by=i.bought?(me||''):'';i.date=i.bought?today():'';save()}}
 
 /* modais */
 function modal(html,onSave,onDel){
@@ -201,8 +210,8 @@ function modal(html,onSave,onDel){
 }
 function itemModal(id){
   const it=S.items.find(x=>x.id===id)||{name:'',room:'Sala',price:0,bought:false};
-  modal(`<h3>${id?'Editar item':'Novo item'}</h3><label>O que é?</label><input id="fN" value="${esc(it.name)}" placeholder="Ex.: Sofá retrátil"><label>Cômodo</label><select id="fR" onchange="$('#fNew').style.display=this.value==='__new'?'block':'none';if(this.value==='__new')$('#fNew').focus()">${[...new Set([...ROOMS,...S.items.map(x=>x.room),it.room])].filter(Boolean).map(r=>`<option value="${esc(r)}" ${r===it.room?'selected':''}>${esc(r)}</option>`).join('')}<option value="__new">＋ Novo cômodo…</option></select><input id="fNew" style="display:none;margin-top:8px" placeholder="Nome do cômodo (ex.: Varanda)"><label>Preço (R$)</label><input id="fP" inputmode="decimal" value="${fmt(it.price)}" placeholder="0,00"><label style="display:flex;gap:10px;align-items:center;margin-top:16px;color:inherit"><input type="checkbox" id="fB" style="width:auto" ${it.bought?'checked':''}> Já comprei</label>`,
-  ()=>{const n=$('#fN').value.trim();if(!n)return;const d={name:n,room:($('#fR').value==='__new'?$('#fNew').value.trim():$('#fR').value)||'Outros',price:num($('#fP').value),bought:$('#fB').checked};
+  modal(`<h3>${id?'Editar item':'Novo item'}</h3><label>O que é?</label><input id="fN" value="${esc(it.name)}" placeholder="Ex.: Sofá retrátil"><label>Cômodo</label><select id="fR" onchange="$('#fNew').style.display=this.value==='__new'?'block':'none';if(this.value==='__new')$('#fNew').focus()">${[...new Set([...ROOMS,...S.items.map(x=>x.room),it.room])].filter(Boolean).map(r=>`<option value="${esc(r)}" ${r===it.room?'selected':''}>${esc(r)}</option>`).join('')}<option value="__new">＋ Novo cômodo…</option></select><input id="fNew" style="display:none;margin-top:8px" placeholder="Nome do cômodo (ex.: Varanda)"><label>Preço (R$)</label><input id="fP" inputmode="decimal" value="${fmt(it.price)}" placeholder="0,00"><label>Link do produto (opcional)</label><input id="fL" value="${esc(it.link||'')}" placeholder="https://..."><label style="display:flex;gap:10px;align-items:center;margin-top:16px;color:inherit"><input type="checkbox" id="fB" style="width:auto" onchange="boughtToggle(this.checked)" ${it.bought?'checked':''}> Já comprei</label><div id="fBox" style="display:${it.bought?'block':'none'}"><label>Comprado por</label><select id="fBy">${[...new Set([...PEOPLE,it.by].filter(Boolean))].map(p=>`<option ${p===(it.by||me)?'selected':''}>${esc(p)}</option>`).join('')}</select><label>Data da compra</label><input type="date" id="fD" value="${it.date||today()}"></div>`,
+  ()=>{const n=$('#fN').value.trim();if(!n)return;const d={name:n,room:($('#fR').value==='__new'?$('#fNew').value.trim():$('#fR').value)||'Outros',price:num($('#fP').value),bought:$('#fB').checked,link:normLink($('#fL').value),by:$('#fB').checked?$('#fBy').value:'',date:$('#fB').checked?$('#fD').value:''};
     if(id)Object.assign(S.items.find(x=>x.id===id),d);else S.items.push({id:uid(),...d});save()},
   id?()=>{S.items=S.items.filter(x=>x.id!==id);save()}:null);
 }
@@ -242,6 +251,7 @@ function apply(d){S={items:d.items||[],goals:d.goals||[]};render()}
 async function start(){
   if(started)return;started=true;
   $('#login').style.display='none';$('#logout').style.display='';
+  const{data:u}=await sb.auth.getUser();me=nameOf(u&&u.user?u.user.email:'');
   let{data,error}=await sb.from('app_state').select('data').eq('id','main').maybeSingle();
   if(error){status('Erro ao carregar: '+error.message);return}
   if(data)apply(data.data);else{S=JSON.parse(JSON.stringify(INICIAL));await save()}
